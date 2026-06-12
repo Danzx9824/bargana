@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -13,18 +12,18 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com', // Avatares do Google
+        hostname: 'lh3.googleusercontent.com',
       },
       {
         protocol: 'https',
-        hostname: 'cdn.discordapp.com', // Avatares do Discord
+        hostname: 'cdn.discordapp.com',
       },
       {
         protocol: 'https',
-        hostname: '*.supabase.co', // Imagens de storage do Supabase
+        hostname: '*.supabase.co',
       }
     ],
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
