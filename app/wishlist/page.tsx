@@ -32,7 +32,7 @@ export default function WishlistPage() {
           </div>
 
           {wishlistItems.map((item) => {
-            // Encontra a oferta mais barata do produto na lista
+            // Ordena numericamente os preços (agora já são numbers após o parse do Context)
             const cheapestListing = item.products.product_listings?.sort((a, b) => a.current_price - b.current_price)[0];
 
             return (

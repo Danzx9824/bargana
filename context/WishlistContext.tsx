@@ -6,13 +6,13 @@ import { useAuth } from "./AuthContext";
 import { Database } from "@/types/database";
 import { toast } from "sonner";
 
+type ProductListing = Database["public"]["Tables"]["product_listings"]["Row"];
+type Product = Database["public"]["Tables"]["products"]["Row"];
+
+// CORREÇÃO: Mudado de 'interface extends' para 'type &' para evitar erro de parsing do TS/Next
 type WishlistItem = Database["public"]["Tables"]["wishlists"]["Row"] & {
-  products: {
-    id: string;
-    title: string;
-    image_url: string | null;
-    slug: string;
-    product_listings: Database["public"]["Tables"]["product_listings"]["Row"][];
+  products: Product & {
+    product_listings: ProductListing[];
   };
 };
 
@@ -32,6 +32,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [wishlistProductIds, setWishlistProductIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
+  const parsePrice = (price: number | string): number => {
+    return typeof price === 'string' ? parseFloat(price) : price;
+  };
+
   const fetchWishlist = async () => {
     if (!user) {
       setWishlistItems([]);
@@ -48,7 +52,19 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       .order("added_at", { ascending: false });
 
     if (!error && data) {
-      setWishlistItems(data as WishlistItem[]);
+      const parsedData = data.map((item: any) => ({
+        ...item,
+        products: {
+          ...item.products,
+          product_listings: item.products.product_listings.map((l: any) => ({
+            ...l,
+            current_price: parsePrice(l.current_price),
+            original_price: parsePrice(l.original_price),
+          }))
+        }
+      })) as WishlistItem[];
+
+      setWishlistItems(parsedData);
       setWishlistProductIds(new Set(data.map((item) => item.product_id)));
     }
     setLoading(false);
@@ -66,7 +82,6 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
     const isWishlisted = wishlistProductIds.has(productId);
 
-    // Otimismo de UI (Atualiza instantaneamente)
     if (isWishlisted) {
       setWishlistProductIds(prev => { const n = new Set(prev); n.delete(productId); return n; });
       setWishlistItems(prev => prev.filter(i => i.product_id !== productId));
@@ -74,12 +89,11 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       setWishlistProductIds(prev => { const n = new Set(prev); n.add(productId); return n; });
     }
 
-    // Requisição ao banco
     if (isWishlisted) {
       const { error } = await supabase.from("wishlists").delete().match({ user_id: user.id, product_id: productId });
       if (error) {
         toast.error("Erro ao remover da lista.");
-        fetchWishlist(); // Reverte UI
+        fetchWishlist(); 
       } else {
         toast.success("Removido da Lista de Desejos.");
       }
@@ -87,10 +101,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.from("wishlists").insert({ user_id: user.id, product_id: productId });
       if (error) {
         toast.error("Erro ao adicionar na lista.");
-        fetchWishlist(); // Reverte UI
+        fetchWishlist(); 
       } else {
         toast.success("Adicionado à Lista de Desejos!");
-        fetchWishlist(); // Refaz fetch para pegar dados completos do produto
+        fetchWishlist(); 
       }
     }
   };

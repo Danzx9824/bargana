@@ -10,7 +10,8 @@ export default function OfferCard({ deal }: any) {
 
   return (
     <div className="bg-surface rounded-xl border border-border overflow-hidden group hover:border-gold/50 transition-all duration-300 flex flex-col">
-      <Link href={`/deal/${deal.product_id}`} className="relative aspect-[3/4] md:aspect-[4/3] overflow-hidden block">
+      
+      <Link href={`/product/${deal.slug}`} className="relative aspect-[3/4] md:aspect-[4/3] overflow-hidden block">
         <img src={deal.image_url} alt={deal.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         
         <div className="absolute top-2 left-2 flex flex-col gap-1">
@@ -27,7 +28,7 @@ export default function OfferCard({ deal }: any) {
         </div>
 
         <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] md:text-xs text-gold border border-gold/30">
-          {deal.platform}
+          {deal.listing_platform || deal.base_platform}
         </div>
       </Link>
 
@@ -46,12 +47,15 @@ export default function OfferCard({ deal }: any) {
           
           <div className="flex gap-2">
             <button 
-              onClick={() => toggleWishlist(deal.product_id)}
+              onClick={(e) => {
+                e.preventDefault();
+                toggleWishlist(deal.product_id);
+              }}
               className={`p-2 rounded-lg transition-colors ${isWishlisted ? 'bg-red-500/20 text-red-500' : 'bg-background hover:bg-red-500/20 hover:text-red-500 text-muted'}`}
             >
               <Heart size={16} fill={isWishlisted ? "currentColor" : "none"} />
             </button>
-            <a href={deal.url || "#"} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-gold text-background hover:bg-gold-dark transition-colors">
+            <a href={deal.url || "#"} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="p-2 rounded-lg bg-gold text-background hover:bg-gold-dark transition-colors">
               <ExternalLink size={16} />
             </a>
           </div>
