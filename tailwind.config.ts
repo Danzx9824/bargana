@@ -9,12 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0A0A0A", // Preto profundo
-        surface: "#141414",    // Cinza escuro para superfícies
-        border: "#2A2A2A",     // Cinza médio para divisões
-        muted: "#888888",      // Texto secundário
-        gold: "#D4AF37",       // Dourado elegante
-        "gold-dark": "#B8962E" // Dourado hover
+        background: "#0A0A0A",
+        surface: "#141414",
+        border: "#2A2A2A",
+        muted: "#888888",
+        gold: "#D4AF37",
+        "gold-dark": "#B8962E",
       },
     },
   },
